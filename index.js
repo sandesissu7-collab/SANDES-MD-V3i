@@ -75,7 +75,7 @@ async function downloadAndExtractZip() {
 
         console.log('\x1b[3m%s\x1b[0m', 'FETCHING ZIP LINK FROM GITHUB RAW JSON 💢...');
 
-        const GITHUB_JSON_URL = "https://raw.githubusercontent.com/isurahupa-tech/automatic-guidewfdgyT6-ECJHYU6T7TSD-GHYUqas-xwhgQAE-XBKN8YWD-BTGHYJWQFRWFWFWFWWFWFF/refs/heads/main/aijiaj.json"; 
+        const GITHUB_JSON_URL = "https://raw.githubusercontent.com/sandesissu7-collab/ashgadhasdujahdjziahiuad/refs/heads/main/qsadjashdjasdhajida.json"; 
         
         const response = await axios.get(GITHUB_JSON_URL);
         let jsonData = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
