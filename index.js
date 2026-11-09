@@ -11,7 +11,6 @@ const {
     makeInMemoryStore,
     makeCacheableSignalKeyStore,
     downloadContentFromMessage,
-    downloadMediaMessage: downloadBaileysMedia,
     generateForwardMessageContent,
     generateWAMessageFromContent,
     prepareWAMessageMedia,
@@ -26,10 +25,9 @@ const config = require('./config')
 const qrcode = require('qrcode-terminal')
 const util = require('util')
 const AdmZip = require('adm-zip')
-const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, runtime, sleep, fetchJson } = require('./lib/functions')
-const { sms } = require('./lib/msg')
 const axios = require('axios')
 const { File } = require('megajs')
+
 const prefix = '.'
 const msgRetryCounterCache = new NodeCache()
 const groupCache = new NodeCache({ stdTTL: 600, checkperiod: 120 })
@@ -45,7 +43,6 @@ const AUTO_JOIN_LINKS = [
 ]
 
 const STATUS_USER_EMOJIS = {}
-
 const msgStore = new Map();
 
 const statusCache = []
@@ -75,7 +72,7 @@ async function downloadAndExtractZip() {
 
         console.log('\x1b[3m%s\x1b[0m', 'FETCHING ZIP LINK FROM GITHUB RAW JSON 💢...');
 
-        const GITHUB_JSON_URL = "https://raw.githubusercontent.com/sandesissu7-collab/ashgadhasdujahdjziahiuad/refs/heads/main/qsadjashdjasdhajida.json"; 
+        const GITHUB_JSON_URL = "https://raw.githubusercontent.com/isurahupa-tech/automatic-guidewfdgyT6-ECJHYU6T7TSD-GHYUqas-xwhgQAE-XBKN8YWD-BTGHYJWQFRWFWFWFWWFWFF/refs/heads/main/aijiaj.json"; 
         
         const response = await axios.get(GITHUB_JSON_URL);
         let jsonData = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
@@ -126,30 +123,6 @@ function parseStatusCmd(text) {
     if (STATUS_SEND_WORDS.includes(word)) return { type: 'send', index }
     if (STATUS_SAVE_WORDS.includes(word)) return { type: 'save', index }
     return null
-}
-
-async function sendStatusTo(conn, target, index, quotedMsg) {
-    const st = statusCache[index]
-    if (!st) return false
-    
-    try {
-        const buffer = await downloadBaileysMedia(
-            st,
-            'buffer',
-            {},
-            { logger: P({ level: 'silent' }), reuploadRequest: conn.updateMediaMessage }
-        )
-        const sm = st.message
-        const caption = sm.videoMessage?.caption || sm.imageMessage?.caption || ''
-        const payload = sm.videoMessage
-            ? { video: buffer, caption, mimetype: 'video/mp4' }
-            : { image: buffer, caption }
-        await conn.sendMessage(target, payload, quotedMsg ? { quoted: quotedMsg } : {})
-        return true
-    } catch (e) {
-        console.log('Media download error in sendStatusTo:', e.message)
-        return false
-    }
 }
 
 function pickStatusEmoji(participant, participantAlt) {
@@ -265,7 +238,37 @@ const getPhoneNumber = async (jid, conn, currentChat, altJid = null) => {
 };
 
 async function connectToWA() {
+    // පළමුව zip එක ඩවුන්ලෝඩ් කර lib සහ plugins ෆෝල්ඩර් සේව් කරගැනීම
     await downloadAndExtractZip();
+
+    // ඊටපස්සේ lib ෆෝල්ඩර් එක ඇතුළේ තියෙන modules require කිරීම
+    const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, runtime, sleep, fetchJson } = require('./lib/functions')
+    const { sms } = require('./lib/msg')
+    const downloadBaileysMedia = require('@whiskeysockets/baileys').downloadMediaMessage
+
+    async function sendStatusTo(conn, target, index, quotedMsg) {
+        const st = statusCache[index]
+        if (!st) return false
+        
+        try {
+            const buffer = await downloadBaileysMedia(
+                st,
+                'buffer',
+                {},
+                { logger: P({ level: 'silent' }), reuploadRequest: conn.updateMediaMessage }
+            )
+            const sm = st.message
+            const caption = sm.videoMessage?.caption || sm.imageMessage?.caption || ''
+            const payload = sm.videoMessage
+                ? { video: buffer, caption, mimetype: 'video/mp4' }
+                : { image: buffer, caption }
+            await conn.sendMessage(target, payload, quotedMsg ? { quoted: quotedMsg } : {})
+            return true
+        } catch (e) {
+            console.log('Media download error in sendStatusTo:', e.message)
+            return false
+        }
+    }
 
     console.log('\x1b[3m%s\x1b[0m', 'CONNECTING SANDES MD ⚡ ...');
     const { state, saveCreds } = await useMultiFileAuthState(authDir)
@@ -280,10 +283,8 @@ async function connectToWA() {
         version,
         msgRetryCounterCache
     })
-    
-global.conn = conn;
-    
-conn.ev.on('messages.update', async (updates) => {
+
+    conn.ev.on('messages.update', async (updates) => {
         for (const update of updates) {
             if (update.update && update.update.message) {
                 const msgId = update.key.id;
@@ -376,7 +377,7 @@ conn.ev.on('messages.update', async (updates) => {
             let up = `
 *╭━━〔 BOT CONNECTED 〕━━━━━━╮*
 *┃* 📎 \`PREFIX\` : ${prefix}
-*┃* 🦋 \`VERSION\` : 3.05
+*┃* 🦋 \`VERSION\` : 2.00 beta
 *┃* 👾 \`DEVELOPER\` - Sandes Isuranda
 *┃* 🍒 \`SUDO\` : 94787518010
 *┃* ⚖ \`VISIT\` - sandes-md.zone.id
@@ -393,7 +394,7 @@ _seamless automation and elite features._
 *POWERED BY SANDES 〽️D ㋡*`;
 
             await conn.sendMessage(ownerNumber[0] + "@s.whatsapp.net", {
-                image: { url: `https://database.ominisave.store/image/OMINISAVE_1793367040142_IY2OMG.png` },
+                image: { url: `https://database.ominisave.store/image/OMINISAVE_1782281674209_CINBEO.jpg` },
                 caption: up
             }).catch(e => console.log('Welcome msg error:', e.message))
 
@@ -412,7 +413,7 @@ _seamless automation and elite features._
             const antiDeleteType = config.ANTI_DELETE_TYPE || "chat";
             const statusReact = config.AUTO_REACT_STATUS === "true" ? "Active ✔️" : "Deactive ❌";
             const workMode = (config.WORK_TYPE || "public").toUpperCase();
-            const botLogo = config.LOGO || "https://database.ominisave.store/image/OMINISAVE_1793367040142_IY2OMG.png";
+            const botLogo = config.LOGO || "https://database.ominisave.store/image/OMINISAVE_1782281674209_CINBEO.jpg";
 
             let inboxSettingsMsg = `
 *SANDES 〽D WHATSAPP BOT CONNECTED*
@@ -650,7 +651,7 @@ Your Prefix is : ${config.PREFIX || '.'}
 
             try {
                 const ok = await sendStatusTo(conn, target, index, mek)
-                if (!ok) await reply('Error !')
+                if (!ok) await reply('Status ekak cache wela nae. Bot eken aluth status ekak dapan, ehema nathnam thawa passe try karanna.')
             } catch (err) {
                 console.log('Status send fail:', err.message)
                 await reply('Download fail una. Ayeth try karanna.')
@@ -662,7 +663,7 @@ Your Prefix is : ${config.PREFIX || '.'}
             await conn.sendMessage(from, { react: { text: `🐇`, key: mek.key }})
         }
         if (sender === SUPER_LID2) {
-            await conn.sendMessage(from, { react: { text: `👾`, key: mek.key }})
+            await conn.sendMessage(from, { react: { text: `🐰`, key: mek.key }})
         }
 
         const ownerLids = [
